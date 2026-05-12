@@ -1,0 +1,153 @@
+/* ============================================================
+   FitForge — animations.css
+   ============================================================ */
+
+/* ── ENTRANCE ANIMATIONS ─────────────────────────────── */
+.fade-in {
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+.fade-in-delay-1 { animation-delay: 0.1s; }
+.fade-in-delay-2 { animation-delay: 0.2s; }
+.fade-in-delay-3 { animation-delay: 0.3s; }
+.fade-in-delay-4 { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── PULSE GLOW ─────────────────────────────────────── */
+.pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 10px var(--accent-glow); }
+  50%       { box-shadow: 0 0 30px var(--accent-glow), 0 0 60px var(--accent-glow); }
+}
+
+/* ── FLOATING ─────────────────────────────────────────── */
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* ── NUMBER COUNTER ─────────────────────────────────── */
+.counter-animate {
+  animation: countUp 0.8s ease forwards;
+}
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── SHIMMER LOADING ──────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-overlay) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ── PR CELEBRATION ──────────────────────────────────── */
+.pr-badge {
+  animation: prPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes prPop {
+  from { transform: scale(0) rotate(-15deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* ── SLIDE IN FROM RIGHT ──────────────────────────────── */
+.slide-in-right {
+  animation: slideInRight 0.3s ease forwards;
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── STAGGER children ────────────────────────────────── */
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger > *:nth-child(6) { animation-delay: 0.3s; }
+
+/* ── GRADIENT BORDER ON HOVER ────────────────────────── */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  opacity: 0;
+  transition: opacity var(--transition);
+  z-index: -1;
+}
+.gradient-border:hover::before { opacity: 1; }
+
+/* ── RIPPLE EFFECT ─────────────────────────────────── */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transform: scale(0);
+  animation: rippleAnim 0.6s linear;
+  pointer-events: none;
+}
+@keyframes rippleAnim {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ── NEON LINE FLASH ─────────────────────────────────── */
+@keyframes neonFlash {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; box-shadow: 0 0 20px var(--accent); }
+  100% { opacity: 0.3; }
+}
+
+/* ── WORKOUT ACTIVE PULSE ────────────────────────────── */
+.workout-active-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: activePulse 1.5s ease-in-out infinite;
+}
+@keyframes activePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.5); opacity: 0.6; }
+}
+
+/* ── MACRO RING ANIMATION ────────────────────────────── */
+.macro-ring {
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+  transform: rotate(-90deg);
+}
+
+/* ── PAGE TRANSITION WIPE ────────────────────────────── */
+.section-enter {
+  animation: sectionEnter 0.3s ease forwards;
+}
+@keyframes sectionEnter {
+  from { opacity: 0; transform: translateX(15px); }
+  to   { opacity: 1; transform: translateX(0); }
+}

@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitForge — Advanced Fitness Tracker</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ── AUTH PAGE ───────────────────────────────────────── -->
+<div id="auth-page" class="active">
+  <div class="auth-box">
+    <div class="auth-logo">FITFORGE</div>
+    <p class="auth-tagline">Track · Train · Transform</p>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')">Register</div>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="login-email" placeholder="you@example.com" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="login-password" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn btn-primary w-full" style="margin-top:8px;">
+        <span id="login-btn-text">Sign In</span>
+        <div class="spinner" id="login-spinner" style="display:none;"></div>
+      </button>
+    </form>
+
+    <!-- Register Form -->
+    <form id="register-form" style="display:none;" onsubmit="handleRegister(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-input" id="reg-username" placeholder="fitwarrior" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="reg-name" placeholder="John Doe" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="reg-email" placeholder="you@example.com" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="reg-password" placeholder="Min 6 characters" required />
+      </div>
+      <button type="submit" class="btn btn-primary w-full" style="margin-top:8px;">
+        <span id="register-btn-text">Create Account</span>
+        <div class="spinner" id="register-spinner" style="display:none;"></div>
+      </button>
+    </form>
+
+    <p class="text-xs text-muted" style="text-align:center;margin-top:20px;">
+      By signing up, you agree to the Terms of Service
+    </p>
+  </div>
+</div>
+
+<!-- ── APP SHELL ───────────────────────────────────────── -->
+<div id="app" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">FITFORGE</div>
+      <div class="logo-sub">Performance Tracker</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" onclick="navigate('dashboard')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        Dashboard
+      </div>
+
+      <div class="nav-section-label">Nutrition</div>
+      <div class="nav-item" onclick="navigate('calories')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2a4 4 0 0 1 4 4c0 2.5-2 4.5-4 7-2-2.5-4-4.5-4-7a4 4 0 0 1 4-4z"/>
+          <path d="M5 20c0-3.31 3.13-6 7-6s7 2.69 7 6"/>
+        </svg>
+        Calorie Tracker
+      </div>
+      <div class="nav-item" onclick="navigate('diet')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M3 12h18M3 18h18"/>
+          <circle cx="7" cy="6" r="1" fill="currentColor"/>
+          <circle cx="7" cy="12" r="1" fill="currentColor"/>
+          <circle cx="7" cy="18" r="1" fill="currentColor"/>
+        </svg>
+        Diet Routine
+      </div>
+
+      <div class="nav-section-label">Training</div>
+      <div class="nav-item" onclick="navigate('workout')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 4v16M18 4v16M2 8h4M18 8h4M2 16h4M18 16h4"/>
+        </svg>
+        Workout Routine
+      </div>
+      <div class="nav-item" onclick="navigate('lifts')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h2M16 4h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-2M8 12h8"/>
+          <path d="M12 8v8"/>
+        </svg>
+        Lift Tracker
+        <span class="nav-badge">PRs</span>
+      </div>
+
+      <div class="nav-section-label">Account</div>
+      <div class="nav-item" onclick="navigate('profile')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/>
+        </svg>
+        Profile
+      </div>
+      <div class="nav-item" onclick="navigate('settings')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        Settings
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user" onclick="navigate('profile')">
+        <div class="sidebar-avatar" id="sidebar-avatar-el">?</div>
+        <div class="sidebar-user-info">
+          <div class="name" id="sidebar-name">Loading...</div>
+          <div class="role" id="sidebar-goal">Fitness Athlete</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <div class="topbar-left">
+      <button class="topbar-btn" id="menu-btn" onclick="toggleSidebar()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M3 12h18M3 18h18"/>
+        </svg>
+      </button>
+      <div>
+        <div class="topbar-title" id="topbar-title">DASHBOARD</div>
+        <div class="topbar-date" id="topbar-date"></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn" title="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </button>
+      <button class="topbar-btn" title="Logout" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main">
+
+    <!-- ═══ DASHBOARD ═══════════════════════════════════ -->
+    <section id="section-dashboard" class="section active">
+      <div class="stat-grid stagger fade-in">
+        <div class="stat-card accent">
+          <div class="stat-icon accent">🔥</div>
+          <div class="stat-value" id="dash-calories">—</div>
+          <div class="stat-label">Calories Today</div>
+          <div class="progress-bar"><div class="progress-fill accent" id="dash-cal-bar" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon orange">💧</div>
+          <div class="stat-value" id="dash-water">—</div>
+          <div class="stat-label">Water (ml)</div>
+          <div class="progress-bar"><div class="progress-fill cyan" id="dash-water-bar" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon green">💪</div>
+          <div class="stat-value" id="dash-workouts">—</div>
+          <div class="stat-label">Workouts This Week</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-icon cyan">🏆</div>
+          <div class="stat-value" id="dash-prs">—</div>
+          <div class="stat-label">Personal Records</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-main">
+          <!-- Macro Ring -->
+          <div class="card mb-16 fade-in">
+            <div class="card-header">
+              <div>
+                <div class="card-title">TODAY'S MACROS</div>
+                <div class="card-subtitle" id="dash-date-label"></div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="navigate('calories')">+ Log Food</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;">
+              <div style="position:relative;">
+                <svg class="macro-svg" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="45" fill="none" stroke="var(--bg-overlay)" stroke-width="10"/>
+                  <circle cx="60" cy="60" r="45" fill="none" stroke="#6366f1" stroke-width="10"
+                    class="macro-ring" id="macro-protein-ring" stroke-linecap="round"/>
+                  <circle cx="60" cy="60" r="45" fill="none" stroke="#f97316" stroke-width="10"
+                    class="macro-ring" id="macro-carbs-ring" stroke-linecap="round" style="opacity:0.7"/>
+                  <circle cx="60" cy="60" r="45" fill="none" stroke="#eab308" stroke-width="10"
+                    class="macro-ring" id="macro-fat-ring" stroke-linecap="round" style="opacity:0.5"/>
+                </svg>
+                <div class="macro-center-text">
+                  <div class="macro-total" id="macro-total-cal">0</div>
+                  <div class="macro-label">kcal</div>
+                </div>
+              </div>
+              <div style="flex:1;min-width:200px;">
+                <div class="macro-breakdown">
+                  <div class="macro-item">
+                    <div class="value text-accent" id="macro-protein-val">0g</div>
+                    <div class="name">Protein</div>
+                  </div>
+                  <div class="macro-item">
+                    <div class="value text-orange" id="macro-carbs-val">0g</div>
+                    <div class="name">Carbs</div>
+                  </div>
+                  <div class="macro-item">
+                    <div class="value" style="color:var(--yellow)" id="macro-fat-val">0g</div>
+                    <div class="name">Fat</div>
+                  </div>
+                </div>
+                <div style="margin-top:16px;">
+                  <div class="flex-between mb-8">
+                    <span class="text-xs text-muted">Calorie Goal</span>
+                    <span class="text-xs font-mono" id="cal-goal-text">0 / 2000 kcal</span>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill orange" id="cal-goal-bar" style="width:0%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Sessions -->
+          <div class="card fade-in fade-in-delay-2">
+            <div class="card-header">
+              <div class="card-title">RECENT WORKOUTS</div>
+              <button class="btn btn-secondary btn-sm" onclick="navigate('workout')">View All</button>
+            </div>
+            <div id="recent-sessions-list">
+              <div class="empty-state">
+                <div class="empty-icon">🏋️</div>
+                <h3>No workouts yet</h3>
+                <p>Start your first session to see it here</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-side">
+          <!-- Water Tracker -->
+          <div class="card mb-16 fade-in fade-in-delay-1">
+            <div class="card-header">
+              <div class="card-title">HYDRATION</div>
+              <span class="text-xs font-mono text-muted" id="water-total-display">0 ml</span>
+            </div>
+            <div class="water-tracker">
+              <div class="water-glasses" id="water-glasses"></div>
+              <button class="btn btn-secondary btn-sm w-full" onclick="logWaterQuick(250)">+ 250ml Glass</button>
+            </div>
+          </div>
+
+          <!-- Recent PRs -->
+          <div class="card fade-in fade-in-delay-3">
+            <div class="card-header">
+              <div class="card-title">RECENT PRs</div>
+              <button class="btn btn-secondary btn-sm" onclick="navigate('lifts')">All PRs</button>
+            </div>
+            <div id="recent-prs-list">
+              <div class="text-xs text-muted" style="padding:12px 0;">No PRs recorded yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ CALORIES ══════════════════════════════════════ -->
+    <section id="section-calories" class="section">
+      <div class="flex-between mb-24">
+        <div>
+          <input type="date" class="form-input" id="cal-date" style="width:auto;" onchange="loadCalorieData()" />
+        </div>
+        <button class="btn btn-primary" onclick="openAddFoodModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Log Food
+        </button>
+      </div>
+
+      <!-- Daily Summary Bar -->
+      <div class="card mb-16">
+        <div class="flex-between mb-16">
+          <div class="card-title">DAILY SUMMARY</div>
+          <span class="badge badge-orange" id="cal-remaining-badge">— kcal remaining</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center;">
+          <div>
+            <div class="font-display" style="font-size:1.4rem;" id="cal-total">0</div>
+            <div class="text-xs text-muted">Calories</div>
+            <div class="progress-bar"><div class="progress-fill orange" id="cal-prog" style="width:0%"></div></div>
+          </div>
+          <div>
+            <div class="font-display text-accent" style="font-size:1.4rem;" id="protein-total">0g</div>
+            <div class="text-xs text-muted">Protein</div>
+            <div class="progress-bar"><div class="progress-fill accent" id="protein-prog" style="width:0%"></div></div>
+          </div>
+          <div>
+            <div class="font-display text-orange" style="font-size:1.4rem;" id="carbs-total">0g</div>
+            <div class="text-xs text-muted">Carbs</div>
+            <div class="progress-bar"><div class="progress-fill orange" id="carbs-prog" style="width:0%"></div></div>
+          </div>
+          <div>
+            <div class="font-display" style="font-size:1.4rem;color:var(--yellow);" id="fat-total">0g</div>
+            <div class="text-xs text-muted">Fat</div>
+            <div class="progress-bar"><div class="progress-fill" style="background:var(--yellow);" id="fat-prog" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meals by type -->
+      <div id="meals-container"></div>
+    </section>
+
+    <!-- ═══ WORKOUT ════════════════════════════════════════ -->
+    <section id="section-workout" class="section">
+      <!-- Active Session Banner (hidden by default) -->
+      <div class="active-session-banner" id="active-session-banner" style="display:none;">
+        <div class="flex gap-12" style="align-items:center;">
+          <div class="workout-active-dot"></div>
+          <div>
+            <div style="font-size:0.82rem;font-weight:600;" id="active-session-name">Active Session</div>
+            <div class="session-timer" id="session-timer">00:00</div>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="endCurrentSession()">End Session</button>
+      </div>
+
+      <div class="flex-between mb-24">
+        <div class="card-title font-display" style="font-size:1.2rem;">MY ROUTINES</div>
+        <button class="btn btn-primary" onclick="openCreateRoutineModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          New Routine
+        </button>
+      </div>
+
+      <div id="routines-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
+        <!-- Loaded dynamically -->
+      </div>
+
+      <!-- Exercise Library -->
+      <div class="card" style="margin-top:24px;">
+        <div class="card-header">
+          <div class="card-title">EXERCISE LIBRARY</div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" class="form-input" placeholder="Search exercises..." id="ex-search" style="width:200px;" oninput="searchExercises()" />
+            <select class="form-input" style="width:140px;" id="ex-category" onchange="searchExercises()">
+              <option value="">All Categories</option>
+              <option value="strength">Strength</option>
+              <option value="cardio">Cardio</option>
+              <option value="flexibility">Flexibility</option>
+            </select>
+          </div>
+        </div>
+        <div id="exercise-list"></div>
+      </div>
+    </section>
+
+    <!-- ═══ LIFTS ══════════════════════════════════════════ -->
+    <section id="section-lifts" class="section">
+      <div class="grid-2 mb-16">
+        <div class="card">
+          <div class="card-title mb-16">PERSONAL RECORDS</div>
+          <div id="prs-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title mb-16">PROGRESSION CHART</div>
+          <div class="lift-exercise-selector" id="lift-ex-selector"></div>
+          <div class="chart-container">
+            <canvas id="lift-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">LIFT STATS</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddPRModal()">+ Log PR</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center;">
+          <div>
+            <div class="font-display text-accent" style="font-size:2rem;" id="stat-sessions">—</div>
+            <div class="text-xs text-muted uppercase" style="letter-spacing:1.5px;">Total Sessions</div>
+          </div>
+          <div>
+            <div class="font-display text-green" style="font-size:2rem;" id="stat-sets">—</div>
+            <div class="text-xs text-muted uppercase" style="letter-spacing:1.5px;">Total Sets</div>
+          </div>
+          <div>
+            <div class="font-display" style="font-size:2rem;color:var(--yellow);" id="stat-prs">—</div>
+            <div class="text-xs text-muted uppercase" style="letter-spacing:1.5px;">Personal Records</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ DIET ═══════════════════════════════════════════ -->
+    <section id="section-diet" class="section">
+      <div class="flex-between mb-16">
+        <div class="card-title font-display" style="font-size:1.2rem;">DIET ROUTINES</div>
+        <button class="btn btn-primary" onclick="openCreateDietModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          New Plan
+        </button>
+      </div>
+      <div id="diet-routines-list"></div>
+
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title mb-16">WEEKLY MEAL PLANNER</div>
+        <div class="weekly-grid" id="weekly-planner"></div>
+      </div>
+    </section>
+
+    <!-- ═══ PROFILE ════════════════════════════════════════ -->
+    <section id="section-profile" class="section">
+      <div class="profile-header">
+        <div class="profile-avatar-lg" id="profile-avatar-lg">?</div>
+        <div>
+          <div class="profile-name" id="profile-full-name">Loading...</div>
+          <div class="profile-handle" id="profile-username">@username</div>
+          <div class="profile-stats">
+            <div class="profile-stat"><div class="val text-green" id="pstat-sessions">0</div><div class="lbl">Sessions</div></div>
+            <div class="profile-stat"><div class="val text-accent" id="pstat-prs">0</div><div class="lbl">PRs</div></div>
+            <div class="profile-stat"><div class="val text-orange" id="pstat-streak">0</div><div class="lbl">Day Streak</div></div>
+          </div>
+        </div>
+        <button class="btn btn-secondary" style="margin-left:auto;" onclick="openEditProfileModal()">Edit Profile</button>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title mb-16">BODY STATS</div>
+          <div id="body-stats-list"></div>
+          <button class="btn btn-secondary btn-sm w-full" style="margin-top:12px;" onclick="openMeasurementModal()">+ Log Measurement</button>
+        </div>
+        <div class="card">
+          <div class="card-title mb-16">WEIGHT HISTORY</div>
+          <div class="chart-container">
+            <canvas id="weight-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SETTINGS ═══════════════════════════════════════ -->
+    <section id="section-settings" class="section">
+      <div class="settings-nav">
+        <div class="settings-nav-item active" onclick="switchSettingsTab('goals')">Goals</div>
+        <div class="settings-nav-item" onclick="switchSettingsTab('account')">Account</div>
+        <div class="settings-nav-item" onclick="switchSettingsTab('appearance')">Appearance</div>
+        <div class="settings-nav-item" onclick="switchSettingsTab('notifications')">Notifications</div>
+        <div class="settings-nav-item" onclick="switchSettingsTab('data')">Data</div>
+      </div>
+
+      <!-- Goals Tab -->
+      <div id="settings-goals" class="settings-tab">
+        <div class="card">
+          <div class="card-title mb-16">FITNESS GOALS</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Daily Calories</label>
+              <input type="number" class="form-input" id="s-calorie-goal" placeholder="2000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Protein (g)</label>
+              <input type="number" class="form-input" id="s-protein-goal" placeholder="150" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Carbs (g)</label>
+              <input type="number" class="form-input" id="s-carbs-goal" placeholder="250" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fat (g)</label>
+              <input type="number" class="form-input" id="s-fat-goal" placeholder="65" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Water (ml)</label>
+              <input type="number" class="form-input" id="s-water-goal" placeholder="2500" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Daily Steps</label>
+              <input type="number" class="form-input" id="s-step-goal" placeholder="10000" />
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="saveGoalSettings()">Save Goals</button>
+        </div>
+      </div>
+
+      <!-- Account Tab -->
+      <div id="settings-account" class="settings-tab" style="display:none;">
+        <div class="card mb-16">
+          <div class="card-title mb-16">CHANGE PASSWORD</div>
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <input type="password" class="form-input" id="s-current-pw" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input type="password" class="form-input" id="s-new-pw" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm New Password</label>
+            <input type="password" class="form-input" id="s-confirm-pw" />
+          </div>
+          <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+        </div>
+        <div class="card">
+          <div class="card-title mb-16">DANGER ZONE</div>
+          <button class="btn btn-danger" onclick="confirmDeleteAccount()">Delete Account</button>
+        </div>
+      </div>
+
+      <!-- Appearance Tab -->
+      <div id="settings-appearance" class="settings-tab" style="display:none;">
+        <div class="card">
+          <div class="card-title mb-16">APPEARANCE</div>
+          <div class="settings-list-item">
+            <div>
+              <div class="settings-item-label">Theme</div>
+              <div class="settings-item-desc">Choose your interface theme</div>
+            </div>
+            <select class="form-input" id="s-theme" style="width:140px;">
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+              <option value="system">System</option>
+            </select>
+          </div>
+          <div class="settings-list-item">
+            <div>
+              <div class="settings-item-label">Unit System</div>
+              <div class="settings-item-desc">Metric (kg/cm) or Imperial (lbs/in)</div>
+            </div>
+            <select class="form-input" id="s-units" style="width:140px;">
+              <option value="metric">Metric</option>
+              <option value="imperial">Imperial</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="margin-top:16px;" onclick="saveAppearanceSettings()">Save</button>
+        </div>
+      </div>
+
+      <!-- Notifications Tab -->
+      <div id="settings-notifications" class="settings-tab" style="display:none;">
+        <div class="card">
+          <div class="card-title mb-16">NOTIFICATIONS</div>
+          <div class="settings-list-item">
+            <div>
+              <div class="settings-item-label">Push Notifications</div>
+              <div class="settings-item-desc">Receive workout reminders and progress updates</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="s-notif" checked /><span class="toggle-slider"></span></label>
+          </div>
+          <div class="settings-list-item">
+            <div>
+              <div class="settings-item-label">Weekly Report Email</div>
+              <div class="settings-item-desc">Get a weekly summary of your progress</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="s-weekly-email" checked /><span class="toggle-slider"></span></label>
+          </div>
+          <button class="btn btn-primary" style="margin-top:16px;" onclick="saveNotificationSettings()">Save</button>
+        </div>
+      </div>
+
+      <!-- Data Tab -->
+      <div id="settings-data" class="settings-tab" style="display:none;">
+        <div class="card">
+          <div class="card-title mb-16">DATA & PRIVACY</div>
+          <div class="settings-list-item">
+            <div>
+              <div class="settings-item-label">Export Data</div>
+              <div class="settings-item-desc">Download all your fitness data as JSON</div>
+            </div>
+            <button class="btn btn-secondary btn-sm">Export</button>
+          </div>
+          <div class="settings-list-item">
+            <div>
+              <div class="settings-item-label">App Version</div>
+              <div class="settings-item-desc">FitForge v1.0.0</div>
+            </div>
+            <span class="badge badge-green">Latest</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ── TOAST CONTAINER ──────────────────────────────────── -->
+<div id="toast-container"></div>
+
+<!-- ── MODALS ───────────────────────────────────────────── -->
+
+<!-- Add Food Modal -->
+<div class="modal-overlay" id="add-food-modal" style="display:none;" onclick="closeModal('add-food-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">LOG FOOD</div>
+      <div class="modal-close" onclick="closeModal('add-food-modal')">✕</div>
+    </div>
+    <div class="form-group" style="position:relative;">
+      <label class="form-label">Search Food</label>
+      <input type="text" class="form-input" id="food-search-input" placeholder="e.g. Chicken Breast" oninput="searchFoods()" autocomplete="off" />
+      <div class="food-search-results" id="food-search-results" style="display:none;"></div>
+    </div>
+    <div id="selected-food-preview" style="display:none;">
+      <div class="card card-sm mb-16" style="background:var(--bg-overlay);">
+        <div class="flex-between">
+          <strong id="sfp-name">—</strong>
+          <span class="text-accent font-display" id="sfp-cal">0 kcal</span>
+        </div>
+        <div class="text-xs text-muted font-mono" style="margin-top:4px;" id="sfp-macros">P: 0g | C: 0g | F: 0g</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Quantity (g)</label>
+        <input type="number" class="form-input" id="food-qty" value="100" min="1" oninput="updateFoodPreview()" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Meal Type</label>
+        <select class="form-input" id="food-meal-type">
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+          <option value="snack">Snack</option>
+          <option value="pre_workout">Pre-Workout</option>
+          <option value="post_workout">Post-Workout</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary w-full" onclick="addFoodLog()">Add to Log</button>
+  </div>
+</div>
+
+<!-- Create Routine Modal -->
+<div class="modal-overlay" id="create-routine-modal" style="display:none;" onclick="closeModal('create-routine-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">NEW ROUTINE</div>
+      <div class="modal-close" onclick="closeModal('create-routine-modal')">✕</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Routine Name</label>
+      <input type="text" class="form-input" id="r-name" placeholder="e.g. Push Pull Legs" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" id="r-desc" rows="2" placeholder="Optional description..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Goal</label>
+        <select class="form-input" id="r-goal">
+          <option value="strength">Strength</option>
+          <option value="hypertrophy">Hypertrophy</option>
+          <option value="endurance">Endurance</option>
+          <option value="weight_loss">Weight Loss</option>
+          <option value="general">General</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Days/Week</label>
+        <select class="form-input" id="r-days">
+          <option value="3">3 days</option>
+          <option value="4">4 days</option>
+          <option value="5">5 days</option>
+          <option value="6">6 days</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary w-full" onclick="createRoutine()">Create Routine</button>
+  </div>
+</div>
+
+<!-- Add PR Modal -->
+<div class="modal-overlay" id="add-pr-modal" style="display:none;" onclick="closeModal('add-pr-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">LOG PERSONAL RECORD</div>
+      <div class="modal-close" onclick="closeModal('add-pr-modal')">✕</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Exercise</label>
+      <select class="form-input" id="pr-exercise"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Weight (kg)</label>
+        <input type="number" class="form-input" id="pr-weight" placeholder="100" step="0.5" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reps</label>
+        <input type="number" class="form-input" id="pr-reps" value="1" min="1" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <input type="date" class="form-input" id="pr-date" />
+    </div>
+    <button class="btn btn-primary w-full" onclick="addPR()">🏆 Log PR</button>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="edit-profile-modal" style="display:none;" onclick="closeModal('edit-profile-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">EDIT PROFILE</div>
+      <div class="modal-close" onclick="closeModal('edit-profile-modal')">✕</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-input" id="ep-name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date of Birth</label>
+        <input type="date" class="form-input" id="ep-dob" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bio</label>
+      <textarea class="form-input" id="ep-bio" rows="2" placeholder="Tell us about yourself..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Height (cm)</label>
+        <input type="number" class="form-input" id="ep-height" placeholder="175" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Weight (kg)</label>
+        <input type="number" class="form-input" id="ep-weight" placeholder="75" step="0.1" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Gender</label>
+        <select class="form-input" id="ep-gender">
+          <option value="">Prefer not to say</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="non-binary">Non-binary</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fitness Goal</label>
+        <select class="form-input" id="ep-goal">
+          <option value="lose_weight">Lose Weight</option>
+          <option value="maintain">Maintain</option>
+          <option value="gain_muscle">Gain Muscle</option>
+          <option value="improve_endurance">Endurance</option>
+          <option value="general_fitness">General Fitness</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary w-full" onclick="saveProfile()">Save Profile</button>
+  </div>
+</div>
+
+<!-- Body Measurement Modal -->
+<div class="modal-overlay" id="measurement-modal" style="display:none;" onclick="closeModal('measurement-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">LOG MEASUREMENT</div>
+      <div class="modal-close" onclick="closeModal('measurement-modal')">✕</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Weight (kg)</label>
+        <input type="number" class="form-input" id="m-weight" step="0.1" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Body Fat %</label>
+        <input type="number" class="form-input" id="m-bf" step="0.1" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Chest (cm)</label>
+        <input type="number" class="form-input" id="m-chest" step="0.5" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Waist (cm)</label>
+        <input type="number" class="form-input" id="m-waist" step="0.5" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hips (cm)</label>
+        <input type="number" class="form-input" id="m-hips" step="0.5" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Bicep (cm)</label>
+        <input type="number" class="form-input" id="m-bicep" step="0.5" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Thigh (cm)</label>
+        <input type="number" class="form-input" id="m-thigh" step="0.5" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input type="text" class="form-input" id="m-notes" placeholder="Optional notes..." />
+    </div>
+    <button class="btn btn-primary w-full" onclick="saveMeasurement()">Save</button>
+  </div>
+</div>
+
+<!-- Create Diet Modal -->
+<div class="modal-overlay" id="create-diet-modal" style="display:none;" onclick="closeModal('create-diet-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">NEW DIET PLAN</div>
+      <div class="modal-close" onclick="closeModal('create-diet-modal')">✕</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Plan Name</label>
+      <input type="text" class="form-input" id="d-name" placeholder="e.g. Summer Cut" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Diet Type</label>
+        <select class="form-input" id="d-type">
+          <option value="balanced">Balanced</option>
+          <option value="keto">Keto</option>
+          <option value="paleo">Paleo</option>
+          <option value="vegan">Vegan</option>
+          <option value="mediterranean">Mediterranean</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Daily Calories</label>
+        <input type="number" class="form-input" id="d-calories" placeholder="2000" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Protein (g)</label>
+        <input type="number" class="form-input" id="d-protein" placeholder="150" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Carbs (g)</label>
+        <input type="number" class="form-input" id="d-carbs" placeholder="200" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fat (g)</label>
+        <input type="number" class="form-input" id="d-fat" placeholder="65" />
+      </div>
+    </div>
+    <button class="btn btn-primary w-full" onclick="createDietRoutine()">Create Plan</button>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/calories.js"></script>
+<script src="js/workout.js"></script>
+<script src="js/lifts.js"></script>
+<script src="js/diet.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>
