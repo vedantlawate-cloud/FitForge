@@ -6,9 +6,11 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// CORS — in production allow the Railway domain or any custom domain set in env.
+// Since we serve the frontend from the same Express server, '*' is fine for the
+// API. If you ever split frontend/backend again, set ALLOWED_ORIGIN in Railway env vars.
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : '*',
+  origin: process.env.ALLOWED_ORIGIN || '*',
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));

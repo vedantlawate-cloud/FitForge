@@ -1,7 +1,23 @@
 /* ============================================================
    FitForge — api.js
    Centralized API client with JWT auth
+   Also defines AppState here so it is available to ALL section
+   JS files regardless of load order.
    ============================================================ */
+
+// ── GLOBAL APP STATE — defined here so every file can access it ──
+const AppState = {
+  currentSection: 'dashboard',
+  user: null,
+  settings: {
+    calorie_goal  : 2000,
+    protein_goal_g: 150,
+    carbs_goal_g  : 250,
+    fat_goal_g    : 65,
+    water_goal_ml : 2500,
+    step_goal     : 10000,
+  },
+};
 
 const API_BASE = '/api';
 

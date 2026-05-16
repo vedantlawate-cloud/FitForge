@@ -1,24 +1,20 @@
 /* ============================================================
    FitForge — app.js
    SPA router, utilities, global UI helpers
+   NOTE: AppState is defined in api.js (loaded first)
    ============================================================ */
 
-// ── STATE ────────────────────────────────────────────────────
-const AppState = {
-  currentSection: 'dashboard',
-  user: null,
-  settings: {},
-};
-
 // ── SECTION MAP ──────────────────────────────────────────────
+// Use string names + dynamic lookup so this object can be defined
+// before the individual section JS files are parsed.
 const SECTIONS = {
-  dashboard : { title: 'DASHBOARD',      init: initDashboard },
-  calories  : { title: 'CALORIE TRACKER', init: initCalories },
-  workout   : { title: 'WORKOUT ROUTINE', init: initWorkout },
-  lifts     : { title: 'LIFT TRACKER',   init: initLifts },
-  diet      : { title: 'DIET ROUTINE',   init: initDiet },
-  profile   : { title: 'PROFILE',        init: initProfile },
-  settings  : { title: 'SETTINGS',       init: initSettings },
+  dashboard : { title: 'DASHBOARD',       initFn: 'initDashboard' },
+  calories  : { title: 'CALORIE TRACKER', initFn: 'initCalories'  },
+  workout   : { title: 'WORKOUT ROUTINE', initFn: 'initWorkout'   },
+  lifts     : { title: 'LIFT TRACKER',    initFn: 'initLifts'     },
+  diet      : { title: 'DIET ROUTINE',    initFn: 'initDiet'      },
+  profile   : { title: 'PROFILE',         initFn: 'initProfile'   },
+  settings  : { title: 'SETTINGS',        initFn: 'initSettings'  },
 };
 
 // ── ROUTER ────────────────────────────────────────────────────
@@ -41,9 +37,10 @@ function navigate(section) {
 
   AppState.currentSection = section;
 
-  // Call section initializer
-  if (SECTIONS[section].init) {
-    try { SECTIONS[section].init(); } catch(e) { console.error(e); }
+  // Call section initializer — look up fn by name at call-time
+  const fnName = SECTIONS[section].initFn;
+  if (fnName && typeof window[fnName] === 'function') {
+    try { window[fnName](); } catch(e) { console.error('[' + fnName + '] error:', e); }
   }
 
   // Close sidebar on mobile
@@ -184,14 +181,15 @@ async function bootApp() {
   try {
     const data = await Api.get('/auth/me');
     AppState.user = data.user;
-    AppState.settings = {
-      calorie_goal  : data.user.calorie_goal  || 2000,
+    // Merge fetched settings into AppState (keeps defaults for any missing fields)
+    Object.assign(AppState.settings, {
+      calorie_goal  : data.user.calorie_goal   || 2000,
       protein_goal_g: data.user.protein_goal_g || 150,
-      carbs_goal_g  : data.user.carbs_goal_g  || 250,
-      fat_goal_g    : data.user.fat_goal_g    || 65,
-      water_goal_ml : data.user.water_goal_ml || 2500,
-      step_goal     : data.user.step_goal     || 10000,
-    };
+      carbs_goal_g  : data.user.carbs_goal_g   || 250,
+      fat_goal_g    : data.user.fat_goal_g     || 65,
+      water_goal_ml : data.user.water_goal_ml  || 2500,
+      step_goal     : data.user.step_goal      || 10000,
+    });
     Api.setUser(data.user);
 
     document.getElementById('auth-page').classList.remove('active');

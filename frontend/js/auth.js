@@ -40,13 +40,13 @@ async function handleLogin(e) {
 
     // Load settings
     const me = await Api.get('/auth/me');
-    AppState.settings = {
-      calorie_goal  : me.user.calorie_goal  || 2000,
+    Object.assign(AppState.settings, {
+      calorie_goal  : me.user.calorie_goal   || 2000,
       protein_goal_g: me.user.protein_goal_g || 150,
-      carbs_goal_g  : me.user.carbs_goal_g  || 250,
-      fat_goal_g    : me.user.fat_goal_g    || 65,
-      water_goal_ml : me.user.water_goal_ml || 2500,
-    };
+      carbs_goal_g  : me.user.carbs_goal_g   || 250,
+      fat_goal_g    : me.user.fat_goal_g     || 65,
+      water_goal_ml : me.user.water_goal_ml  || 2500,
+    });
 
     document.getElementById('auth-page').classList.remove('active');
     document.getElementById('app').style.display = 'grid';
@@ -79,7 +79,7 @@ async function handleRegister(e) {
     Api.setToken(data.token);
     Api.setUser(data.user);
     AppState.user = data.user;
-    AppState.settings = { calorie_goal: 2000, protein_goal_g: 150, carbs_goal_g: 250, fat_goal_g: 65, water_goal_ml: 2500 };
+    Object.assign(AppState.settings, { calorie_goal: 2000, protein_goal_g: 150, carbs_goal_g: 250, fat_goal_g: 65, water_goal_ml: 2500 });
 
     document.getElementById('auth-page').classList.remove('active');
     document.getElementById('app').style.display = 'grid';

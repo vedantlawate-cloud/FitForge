@@ -890,9 +890,12 @@
   </div>
 </div>
 
-<!-- Scripts -->
+<!-- Scripts — ORDER MATTERS:
+     1. api.js       — fetch wrapper, must be first
+     2. section JS   — define all init* functions
+     3. auth.js      — defines handleLogin / handleRegister
+     4. app.js       — references all of the above, boots last -->
 <script src="js/api.js"></script>
-<script src="js/app.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/calories.js"></script>
 <script src="js/workout.js"></script>
@@ -901,5 +904,6 @@
 <script src="js/profile.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
