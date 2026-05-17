@@ -109,17 +109,10 @@ CREATE TABLE IF NOT EXISTS food_logs (
     logged_date DATE NOT NULL DEFAULT CURRENT_DATE,
     meal_type VARCHAR(20) NOT NULL CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack', 'pre_workout', 'post_workout')),
     quantity_g DECIMAL(8,2) NOT NULL,
-    calories DECIMAL(8,2) GENERATED ALWAYS AS (
-        quantity_g / 100.0 * 0
-    ) STORED,
+    calories DECIMAL(8,2),
     notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
--- We compute calories in the app layer for flexibility
--- Drop the generated column and use a real one
-ALTER TABLE food_logs DROP COLUMN calories;
-ALTER TABLE food_logs ADD COLUMN calories DECIMAL(8,2);
 
 CREATE TABLE IF NOT EXISTS water_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
